@@ -398,25 +398,59 @@ function App() {
             const JSZip = (await import('jszip')).default;
             const zip = new JSZip();
 
-            // ファイル名の重複を管理
-            const usedNames = new Map();
+            // ベースURLのパスを取得（ZIP内のルートを決定）
+            const baseUrlObj = new URL(batchUrl);
+            const baseSegments = baseUrlObj.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+
+            // ファイルパスの重複を管理
+            const usedPaths = new Map();
 
             for (const result of successResults) {
-                let baseName = sanitizeFileName(result.title || getFileNameFromUrl(result.url));
                 const extension = batchFormat === 'markdown' ? '.md' : '.txt';
                 const content = batchFormat === 'markdown' ? result.markdown : generateChunksText(result.markdown);
 
-                // ファイル名重複チェック
-                let fileName = `${baseName}${extension}`;
-                if (usedNames.has(fileName)) {
-                    const count = usedNames.get(fileName) + 1;
-                    usedNames.set(fileName, count);
-                    fileName = `${baseName}_${count}${extension}`;
-                } else {
-                    usedNames.set(fileName, 1);
+                // URLパスからZIPファイルパスを生成
+                let urlObj;
+                try { urlObj = new URL(result.url); } catch { continue; }
+
+                // パスセグメントを取得し、ベースパスからの相対パスを計算
+                let pathSegments = urlObj.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+
+                // ベースパスを除去して相対パスにする
+                if (baseSegments.length > 0) {
+                    const baseStr = baseSegments.join('/');
+                    const pathStr = pathSegments.join('/');
+                    if (pathStr.startsWith(baseStr)) {
+                        pathSegments = pathStr.slice(baseStr.length).split('/').filter(Boolean);
+                    }
                 }
 
-                zip.file(fileName, content);
+                // 各セグメントをサニタイズ
+                pathSegments = pathSegments.map((seg) => sanitizeFileName(seg));
+
+                // パスが空の場合（ベースURL自体の場合）はindexとする
+                if (pathSegments.length === 0) {
+                    pathSegments = ['index'];
+                }
+
+                // 最後のセグメントに拡張子を付与
+                const lastSeg = pathSegments[pathSegments.length - 1];
+                // 既に拡張子がある場合は除去してから付け替え
+                pathSegments[pathSegments.length - 1] = lastSeg.replace(/\.[^.]+$/, '');
+
+                let filePath = pathSegments.join('/') + extension;
+
+                // 重複チェック
+                if (usedPaths.has(filePath)) {
+                    const count = usedPaths.get(filePath) + 1;
+                    usedPaths.set(filePath, count);
+                    const base = pathSegments.join('/');
+                    filePath = `${base}_${count}${extension}`;
+                } else {
+                    usedPaths.set(filePath, 1);
+                }
+
+                zip.file(filePath, content);
             }
 
             const blob = await zip.generateAsync({ type: 'blob' });
@@ -682,9 +716,9 @@ function App() {
                                         type="number"
                                         className="number-input"
                                         value={maxPages}
-                                        onChange={(e) => setMaxPages(Math.max(1, Math.min(200, parseInt(e.target.value) || 1)))}
+                                        onChange={(e) => setMaxPages(Math.max(1, Math.min(5000, parseInt(e.target.value) || 1)))}
                                         min={1}
-                                        max={200}
+                                        max={5000}
                                         disabled={crawling}
                                     />
                                 </div>
