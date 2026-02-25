@@ -140,7 +140,7 @@ function App() {
     return (
         <div className="min-h-screen hero-gradient">
             {/* ===== Header ===== */}
-            <header className="border-b border-[var(--color-border)] bg-[var(--color-bg-primary)]/80 backdrop-blur-md sticky top-0 z-50">
+            <header className="border-b border-[var(--color-border-custom)] bg-[var(--color-bg-primary)]/80 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[var(--color-accent)] to-purple-500 flex items-center justify-center">
@@ -273,7 +273,7 @@ function App() {
 
                         {/* Tabs */}
                         <div className="glass-card overflow-hidden">
-                            <div className="flex border-b border-[var(--color-border)]">
+                            <div className="flex border-b border-[var(--color-border-custom)]">
                                 <button
                                     id="tab-markdown"
                                     className={`tab-button ${activeTab === 'markdown' ? 'active' : ''}`}
@@ -379,7 +379,7 @@ function App() {
                                                     </div>
 
                                                     {expandedChunks[chunk.id] && (
-                                                        <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
+                                                        <div className="mt-3 pt-3 border-t border-[var(--color-border-custom)]">
                                                             <div className="chunk-content">
                                                                 {chunk.content}
                                                             </div>
@@ -398,7 +398,7 @@ function App() {
                 {/* ===== Empty State ===== */}
                 {!hasResult && !loading && !error && (
                     <section className="text-center py-16 sm:py-24 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                        <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border)] flex items-center justify-center">
+                        <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-custom)] flex items-center justify-center">
                             <Globe className="w-8 h-8 text-[var(--color-text-muted)]" />
                         </div>
                         <h3 className="text-lg font-semibold text-[var(--color-text-secondary)] mb-2">
@@ -413,7 +413,7 @@ function App() {
             </main>
 
             {/* ===== Footer ===== */}
-            <footer className="border-t border-[var(--color-border)] mt-16">
+            <footer className="border-t border-[var(--color-border-custom)] mt-16">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-center">
                     <p className="text-xs text-[var(--color-text-muted)]">
                         Web2RAG by Scrapify — WebページをRAG用データに変換するツール
